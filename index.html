@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validador de Senha Forte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            opacity: 0.3;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .password-input-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .password-field {
+            width: 100%;
+            padding: 20px 50px 20px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+
+        .password-field:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .strength-section {
+            margin-bottom: 30px;
+        }
+
+        .strength-meter {
+            height: 12px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 6px;
+            transition: all 0.5s ease;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #f1c40f, #2ecc71, #27ae60);
+        }
+
+        .strength-text {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .strength-description {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .requirements-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .requirements-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .requirement-list {
+            list-style: none;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .requirement-item:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .requirement-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .requirement-icon.valid {
+            background: #27ae60;
+            color: white;
+        }
+
+        .requirement-icon.invalid {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .requirement-text {
+            flex: 1;
+            color: #2c3e50;
+        }
+
+        .requirement-details {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .time-to-crack {
+            background: #34495e;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .time-to-crack h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .time-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2ecc71;
+        }
+
+        .time-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .suggestions-section {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .suggestions-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .suggestions-list {
+            list-style-type: none;
+        }
+
+        .suggestion-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #bdc3c7;
+            color: #2c3e50;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item::before {
+            content: "💡";
+            margin-right: 10px;
+        }
+
+        .actions-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .actions-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .score-breakdown {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .score-breakdown h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .score-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .score-category {
+            color: #2c3e50;
+        }
+
+        .score-value {
+            font-weight: bold;
+        }
+
+        .score-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #bdc3c7;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lock-icon">🔒</div>
+            <h1>🔐 Validador de Senha Forte</h1>
+            <p>Verifique a segurança da sua senha em tempo real</p>
+        </div>
+
+        <div class="content">
+            <div class="password-input-section">
+                <input type="password" id="passwordField" class="password-field" 
+                       placeholder="Digite sua senha para analisar..." autocomplete="off">
+                <button class="toggle-password" id="togglePassword">👁️</button>
+            </div>
+
+            <div class="strength-section">
+                <div class="strength-text" id="strengthText">Digite uma senha</div>
+                <div class="strength-description" id="strengthDescription">A senha será analisada automaticamente</div>
+                <div class="strength-meter">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+            </div>
+
+            <div class="requirements-section">
+                <h3>📋 Requisitos de Segurança</h3>
+                <ul class="requirement-list" id="requirementList">
+                    <!-- Os requisitos serão inseridos via JavaScript -->
+                </ul>
+            </div>
+
+            <div class="time-to-crack">
+                <h3>⏱️ Tempo Estimado para Quebra</h3>
+                <div class="time-value" id="timeToCrack">Instantâneo</div>
+                <div class="time-description" id="crackDescription">Senha muito fraca</div>
+            </div>
+
+            <div class="score-breakdown">
+                <h4>📊 Pontuação Detalhada</h4>
+                <div id="scoreDetails">
+                    <!-- Detalhes da pontuação serão inseridos via JavaScript -->
+                </div>
+            </div>
+
+            <div class="suggestions-section">
+                <h3>💡 Sugestões para Melhorar</h3>
+                <ul class="suggestions-list" id="suggestionsList">
+                    <!-- Sugestões serão inseridas via JavaScript -->
+                </ul>
+            </div>
+
+            <div class="actions-section">
+                <button class="btn btn-primary" onclick="generateStrongPassword()">🎲 Gerar Senha Forte</button>
+                <button class="btn btn-success" id="copyButton" onclick="copyPassword()" disabled>📋 Copiar Senha</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">Senha copiada para a área de transferência!</div>
+
+    <script>
+        // Elementos DOM
+        const passwordField = document.getElementById('passwordField');
+        const togglePassword = document.getElementById('togglePassword');
+        const strengthText = document.getElementById('strengthText');
+        const strengthDescription = document.getElementById('strengthDescription');
+        const strengthFill = document.getElementById('strengthFill');
+        const requirementList = document.getElementById('requirementList');
+        const timeToCrack = document.getElementById('timeToCrack');
+        const crackDescription = document.getElementById('crackDescription');
+        const suggestionsList = document.getElementById('suggestionsList');
+        const copyButton = document.getElementById('copyButton');
+        const scoreDetails = document.getElementById('scoreDetails');
+        const notification = document.getElementById('notification');
+
+        // Requisitos de segurança
+        const requirements = [
+            {
+                id: 'length',
+                text: 'Pelo menos 12 caracteres',
+                description: 'Senhas mais longas são mais seguras',
+                test: (password) => password.length >= 12,
+                weight: 20
+            },
+            {
+                id: 'uppercase',
+                text: 'Letras maiúsculas (A-Z)',
+                description: 'Pelo menos uma letra maiúscula',
+                test: (password) => /[A-Z]/.test(password),
+                weight: 15
+            },
+            {
+                id: 'lowercase',
+                text: 'Letras minúsculas (a-z)',
+                description: 'Pelo menos uma letra minúscula',
+                test: (password) => /[a-z]/.test(password),
+                weight: 15
+            },
+            {
+                id: 'numbers',
+                text: 'Números (0-9)',
+                description: 'Pelo menos um número',
+                test: (password) => /[0-9]/.test(password),
+                weight: 15
+            },
+            {
+                id: 'symbols',
+                text: 'Símbolos especiais',
+                description: 'Pelo menos um símbolo (!@#$%^&* etc.)',
+                test: (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+                weight: 15
+            },
+            {
+                id: 'sequences',
+                text: 'Sem sequências óbvias',
+                description: 'Evitar "123", "abc", "qwerty", etc.',
+                test: (password) => !/(123|abc|qwerty|asdf|password|senha)/i.test(password),
+                weight: 10
+            },
+            {
+                id: 'repeats',
+                text: 'Sem caracteres repetidos em sequência',
+                description: 'Evitar "aaa", "111", etc.',
+                test: (password) => !/(.)\1{2,}/.test(password),
+                weight: 10
+            }
+        ];
+
+        // Senhas comuns que devem ser evitadas
+        const commonPasswords = [
+            'password', '123456', '12345678', '1234', 'qwerty', '12345', 
+            'senha', 'admin', 'welcome', 'monkey', '1234567', '123456789',
+            'password1', '123123', '111111', 'abc123', 'senha123'
+        ];
+
+        // Inicializar lista de requisitos
+        function initializeRequirements() {
+            requirementList.innerHTML = requirements.map(req => `
+                <li class="requirement-item">
+                    <div class="requirement-icon invalid">✕</div>
+                    <div class="requirement-text">
+                        ${req.text}
+                        <div class="requirement-details">${req.description}</div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Alternar visibilidade da senha
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+
+        // Analisar senha em tempo real
+        passwordField.addEventListener('input', function() {
+            analyzePassword(this.value);
+        });
+
+        // Analisar senha
+        function analyzePassword(password) {
+            if (!password) {
+                resetAnalysis();
+                return;
+            }
+
+            // Verificar cada requisito
+            let totalScore = 0;
+            let metRequirements = 0;
+            const requirementResults = [];
+
+            requirements.forEach(requirement => {
+                const isValid = requirement.test(password);
+                requirementResults.push({
+                    ...requirement,
+                    isValid
+                });
+
+                if (isValid) {
+                    totalScore += requirement.weight;
+                    metRequirements++;
+                }
+            });
+
+            // Bônus por comprimento extra
+            if (password.length > 16) {
+                totalScore += 10;
+            }
+
+            // Bônus por variedade de caracteres
+            const charVariety = calculateCharVariety(password);
+            totalScore += charVariety * 5;
+
+            // Penalidade por senhas comuns
+            if (commonPasswords.includes(password.toLowerCase())) {
+                totalScore = Math.max(10, totalScore - 50);
+            }
+
+            // Garantir que a pontuação esteja entre 0 e 100
+            totalScore = Math.max(0, Math.min(100, totalScore));
+
+            // Atualizar interface
+            updateRequirementsDisplay(requirementResults);
+            updateStrengthMeter(totalScore, metRequirements);
+            updateTimeToCrack(password, totalScore);
+            updateSuggestions(requirementResults, password);
+            updateScoreDetails(requirementResults, totalScore, charVariety);
+            
+            // Habilitar/desabilitar botão de copiar
+            copyButton.disabled = password.length === 0;
+        }
+
+        // Calcular variedade de caracteres
+        function calculateCharVariety(password) {
+            const types = {
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                numbers: /[0-9]/.test(password),
+                symbols: /[^a-zA-Z0-9]/.test(password)
+            };
+            
+            return Object.values(types).filter(Boolean).length;
+        }
+
+        // Atualizar exibição dos requisitos
+        function updateRequirementsDisplay(results) {
+            requirementList.innerHTML = results.map(result => `
+                <li class="requirement-item">
+                    <div class="requirement-icon ${result.isValid ? 'valid' : 'invalid'}">
+                        ${result.isValid ? '✓' : '✕'}
+                    </div>
+                    <div class="requirement-text">
+                        ${result.text}
+                        <div class="requirement-details">${result.description}</div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Atualizar medidor de força
+        function updateStrengthMeter(score, metCount) {
+            strengthFill.style.width = `${score}%`;
+            
+            // Definir cor baseada na pontuação
+            let color, text, description;
+            
+            if (score < 20) {
+                color = '#e74c3c';
+                text = 'Muito Fraca';
+                description = 'Senha extremamente vulnerável';
+            } else if (score < 40) {
+                color = '#e67e22';
+                text = 'Fraca';
+                description = 'Senha facilmente quebrável';
+            } else if (score < 60) {
+                color = '#f1c40f';
+                text = 'Moderada';
+                description = 'Senha com segurança básica';
+            } else if (score < 80) {
+                color = '#2ecc71';
+                text = 'Forte';
+                description = 'Boa senha, mas pode melhorar';
+            } else {
+                color = '#27ae60';
+                text = 'Muito Forte';
+                description = 'Excelente! Senha muito segura';
+            }
+            
+            strengthFill.style.background = color;
+            strengthText.textContent = text;
+            strengthText.style.color = color;
+            strengthDescription.textContent = description;
+        }
+
+        // Atualizar tempo estimado para quebra
+        function updateTimeToCrack(password, score) {
+            // Cálculo simplificado baseado no comprimento e complexidade
+            const baseTime = Math.pow(72, password.length) / 1000000000; // 72 caracteres possíveis
+            let timeSeconds = baseTime * (score / 100);
+            
+            // Ajustar para senhas comuns
+            if (commonPasswords.includes(password.toLowerCase())) {
+                timeSeconds = 1;
+            }
+            
+            let timeText, description;
+            
+            if (timeSeconds < 1) {
+                timeText = 'Instantâneo';
+                description = 'Senha extremamente fraca';
+            } else if (timeSeconds < 60) {
+                timeText = 'Segundos';
+                description = 'Senha muito fraca';
+            } else if (timeSeconds < 3600) {
+                timeText = 'Minutos';
+                description = 'Senha fraca';
+            } else if (timeSeconds < 86400) {
+                timeText = 'Horas';
+                description = 'Senha razoável';
+            } else if (timeSeconds < 31536000) {
+                timeText = 'Dias';
+                description = 'Senha boa';
+            } else if (timeSeconds < 3153600000) {
+                timeText = 'Anos';
+                description = 'Senha forte';
+            } else {
+                timeText = 'Séculos';
+                description = 'Senha excelente!';
+            }
+            
+            timeToCrack.textContent = timeText;
+            crackDescription.textContent = description;
+        }
+
+        // Atualizar sugestões
+        function updateSuggestions(results, password) {
+            const suggestions = [];
+            
+            if (password.length < 12) {
+                suggestions.push(`Adicione mais ${12 - password.length} caracteres`);
+            }
+            
+            if (!results.find(r => r.id === 'uppercase').isValid) {
+                suggestions.push('Adicione letras maiúsculas');
+            }
+            
+            if (!results.find(r => r.id === 'lowercase').isValid) {
+                suggestions.push('Adicione letras minúsculas');
+            }
+            
+            if (!results.find(r => r.id === 'numbers').isValid) {
+                suggestions.push('Inclua números');
+            }
+            
+            if (!results.find(r => r.id === 'symbols').isValid) {
+                suggestions.push('Use símbolos especiais');
+            }
+            
+            if (!results.find(r => r.id === 'sequences').isValid) {
+                suggestions.push('Evite sequências comuns');
+            }
+            
+            if (!results.find(r => r.id === 'repeats').isValid) {
+                suggestions.push('Evite caracteres repetidos');
+            }
+            
+            if (commonPasswords.includes(password.toLowerCase())) {
+                suggestions.push('Evite senhas comumente usadas');
+            }
+            
+            if (suggestions.length === 0) {
+                suggestions.push('Sua senha atende a todos os critérios de segurança!');
+            }
+            
+            suggestionsList.innerHTML = suggestions.map(suggestion => `
+                <li class="suggestion-item">${suggestion}</li>
+            `).join('');
+        }
+
+        // Atualizar detalhes da pontuação
+        function updateScoreDetails(results, totalScore, charVariety) {
+            const details = results.map(result => `
+                <div class="score-item">
+                    <span class="score-category">${result.text}</span>
+                    <span class="score-value" style="color: ${result.isValid ? '#27ae60' : '#e74c3c'}">
+                        ${result.isValid ? `+${result.weight}` : '0'}
+                    </span>
+                </div>
+            `).join('');
+            
+            scoreDetails.innerHTML = details + `
+                <div class="score-item">
+                    <span class="score-category">Variedade de caracteres</span>
+                    <span class="score-value" style="color: #3498db">+${charVariety * 5}</span>
+                </div>
+                <div class="score-item score-total">
+                    <span class="score-category">Pontuação Total</span>
+                    <span class="score-value">${totalScore}/100</span>
+                </div>
+            `;
+        }
+
+        // Resetar análise
+        function resetAnalysis() {
+            strengthFill.style.width = '0%';
+            strengthText.textContent = 'Digite uma senha';
+            strengthText.style.color = '#2c3e50';
+            strengthDescription.textContent = 'A senha será analisada automaticamente';
+            timeToCrack.textContent = 'Instantâneo';
+            crackDescription.textContent = 'Senha muito fraca';
+            copyButton.disabled = true;
+            initializeRequirements();
+            suggestionsList.innerHTML = '<li class="suggestion-item">Digite uma senha para ver sugestões</li>';
+            scoreDetails.innerHTML = '<div class="score-item"><span class="score-category">Digite uma senha para ver a pontuação</span></div>';
+        }
+
+        // Gerar senha forte
+        function generateStrongPassword() {
+            const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+            const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const numbers = '0123456789';
+            const symbols = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            let password = '';
+            const allChars = lowercase + uppercase + numbers + symbols;
+            
+            // Garantir pelo menos um de cada tipo
+            password += lowercase[Math.floor(Math.random() * lowercase.length)];
+            password += uppercase[Math.floor(Math.random() * uppercase.length)];
+            password += numbers[Math.floor(Math.random() * numbers.length)];
+            password += symbols[Math.floor(Math.random() * symbols.length)];
+            
+            // Completar até 16 caracteres
+            for (let i = password.length; i < 16; i++) {
+                password += allChars[Math.floor(Math.random() * allChars.length)];
+            }
+            
+            // Embaralhar a senha
+            password = password.split('').sort(() => 0.5 - Math.random()).join('');
+            
+            passwordField.value = password;
+            passwordField.type = 'text';
+            togglePassword.textContent = '👁️‍🗨️';
+            analyzePassword(password);
+            showNotification('Senha forte gerada!');
+        }
+
+        // Copiar senha
+        function copyPassword() {
+            if (!passwordField.value) return;
+            
+            navigator.clipboard.writeText(passwordField.value).then(() => {
+                showNotification('Senha copiada para a área de transferência!');
+            }).catch(() => {
+                // Fallback para navegadores mais antigos
+                passwordField.select();
+                document.execCommand('copy');
+                showNotification('Senha copiada para a área de transferência!');
+            });
+        }
+
+        // Mostrar notificação
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Inicializar
+        initializeRequirements();
+        passwordField.focus();
+    </script>
+</body>
+</html>
